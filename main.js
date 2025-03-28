@@ -5,11 +5,10 @@ canvas.width = 512;
 canvas.height = 512;
 
 const images = {
-    //bg_img: 'https://raw.githubusercontent.com/Swillycoder/Rottentomatos/main/bg.png',
-    intro_img: 'https://raw.githubusercontent.com/Swillycoder/Rottentomatos/main/intro.png',
-    shroom_img: 'https://raw.githubusercontent.com/Swillycoder/Rottentomatos/main/shroom.png',
-    house_img: 'https://raw.githubusercontent.com/Swillycoder/Rottentomatos/main/house.png',
-    map_img: 'https://raw.githubusercontent.com/Swillycoder/Rottentomatos/main/map.png',
+    intro_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/intro.png',
+    shroom_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/shroom.png',
+    house_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/house.png',
+    map_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/map.png',
 };
 
 const loadImage = (src) => {
