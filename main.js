@@ -6,7 +6,10 @@ canvas.height = 512;
 
 const images = {
     intro_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/intro.png',
-    shroom_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/shroom.png',
+    shroom_standl: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/stand_l.png',
+    shroom_standr: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/stand_r.png',
+    shroom_walkl: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/walk_l.png',
+    shroom_walkr: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/walk_r.png',
     house_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/house.png',
     map_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/map.png',
 };
@@ -34,14 +37,21 @@ async function loadAllImages(imageSources) {
 }
 
 class Player {
-    constructor (x,y, image) {
+    constructor (x,y, width, height, standing_l, standing_r, walking_l, walking_r, currentSprite) {
         this.x = x;
         this.y = y;
-        this.image = image;
-        this.width = 32;
-        this.height = 32;
-        this.speed = 2
+        this.width = width;
+        this.height = height;
+        this.speed = 2;
         this.radius = 16;
+        this.standing_l = standing_l;
+        this.standing_r = standing_r
+        this.walking_l = walking_l;
+        this.walking_r = walking_r;
+        this.currentSprite = currentSprite;
+        this.frames = 0;
+        this.frameDelay = 10;
+        this.frameTimer = 0;
     }
 
     boundaries () {
@@ -52,19 +62,70 @@ class Player {
     }
 
     draw () {
-        //ctx.fillStyle = this.color;
-        //ctx.fillRect = (this.x, this.y, this.width, this.height)
-        ctx.drawImage(this.image, this.x, this.y)
+        ctx.drawImage(
+            this.currentSprite,
+            this.width * this.frames,
+            0,
+            this.width,
+            this.height,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+          );
     }
     update () {
-        if (keys.KeyA) this.x -= this.speed;
-        if (keys.KeyD) this.x += this.speed;
-        if (keys.KeyW) this.y -= this.speed;
-        if (keys.KeyA) this.y += this.speed;
-        if (keys.ArrowLeft) this.x -= this.speed;
-        if (keys.ArrowRight) this.x += this.speed;
-        if (keys.ArrowUp) this.y -= this.speed;
-        if (keys.ArrowDown) this.y += this.speed;
+        this.frameTimer++;
+        if (this.frameTimer >= this.frameDelay) {
+          this.frames++;
+          this.frameTimer = 0;
+        }
+    
+        if (this.frames >= 4 && this.currentSprite === this.standing_l) {
+          this.frames = 0;
+        }
+        if (this.frames >= 4 && this.currentSprite === this.standing_r) {
+            this.frames = 0;
+        }
+        if (this.frames >= 4 && this.currentSprite === this.walking_l) {
+            this.frames = 0;
+        }
+        if (this.frames >= 4 && this.currentSprite === this.walking_r) {
+            this.frames = 0;
+        }
+
+        if (keys.KeyA || keys.ArrowLeft) {
+            this.x -= this.speed;
+            this.currentSprite = this.walking_l;
+        }
+        if (keys.KeyD || keys.ArrowRight) {
+            this.x += this.speed;
+            this.currentSprite = this.walking_r;
+        }
+        if ((keys.KeyW || keys.ArrowUp) && (keys.KeyA || keys.ArrowLeft)) {
+            this.y -= this.speed/4;
+            this.currentSprite = this.walking_l;
+        }
+        if ((keys.KeyW || keys.ArrowUp) && (keys.KeyD || keys.ArrowRight)) {
+            this.y -= this.speed/4;
+            this.currentSprite = this.walking_r;
+        }
+        if ((keys.KeyS || keys.ArrowDown) && (keys.KeyA || keys.ArrowLeft)) {
+            this.y += this.speed/4;
+            this.currentSprite = this.walking_l;
+        }
+        if ((keys.KeyS || keys.ArrowDown) && (keys.KeyD || keys.ArrowRight)) {
+            this.y += this.speed/4;
+            this.currentSprite = this.walking_r;
+        }
+        if (keys.KeyW || keys.ArrowUp) {
+            this.y -= this.speed;
+            this.currentSprite = this.walking_r;
+        }
+        if (keys.KeyS || keys.ArrowDown) {
+            this.y += this.speed;
+            this.currentSprite = this.walking_r;
+        }
 
         if (gameState === "gameScreen"){
             for (let building of buildings){
@@ -296,7 +357,10 @@ function winScreen() {
     loadedImages = await loadAllImages(images);
     console.log("All images loaded!");
 
-    player = new Player(canvas.width/2 -25, 400, loadedImages.shroom_img);
+    player = new Player(canvas.width/2 -25, 400, 32, 32, loadedImages.shroom_standl,
+        loadedImages.shroom_standr, loadedImages.shroom_walkl, loadedImages.shroom_walkr,
+        loadedImages.shroom_standr);
+
     buildings = [
         new Building(45,100, loadedImages.house_img),
         new Building(340,100, loadedImages.house_img),
@@ -332,5 +396,14 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('keyup', (e) => {
     if (keys.hasOwnProperty(e.code)) {
         keys[e.code] = false;
+    }
+    if (e.code === "ArrowLeft" || e.code === "KeyA"){
+        player.currentSprite = loadedImages.shroom_standl;
+    }
+    if (e.code === "ArrowRight" || e.code === "KeyD"){
+        player.currentSprite = loadedImages.shroom_standr;
+    }
+    if (e.code === "ArrowUp" || e.code === "ArrowDown" || e.code === "KeyW" || e.code === "KeyS"){
+        player.currentSprite = loadedImages.shroom_standr;
     }
 });
