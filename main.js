@@ -12,6 +12,13 @@ const images = {
     shroom_walkr: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/walk_r.png',
     house_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/house.png',
     map_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/map.png',
+
+    shroom_walkup: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/shroomback.png',
+    house_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/house.png',
+    fly_agaric: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/flyagaricanim.png',
+    greenshroom_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/greenshroomsprite.png',
+    eggshroom_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/eggshroomsprite.png',
+
 };
 
 const loadImage = (src) => {
@@ -37,9 +44,10 @@ async function loadAllImages(imageSources) {
 }
 
 class Player {
-    constructor (x,y, width, height, standing_l, standing_r, walking_l, walking_r, currentSprite) {
+    constructor (x,y, width, height, standing_l, standing_r, walking_up, walking_l, walking_r, currentSprite) {
         this.x = x;
         this.y = y;
+        //this.image = image;
         this.width = width;
         this.height = height;
         this.speed = 2;
@@ -48,6 +56,7 @@ class Player {
         this.standing_r = standing_r
         this.walking_l = walking_l;
         this.walking_r = walking_r;
+        this.walking_up = walking_up;
         this.currentSprite = currentSprite;
         this.frames = 0;
         this.frameDelay = 10;
@@ -73,60 +82,12 @@ class Player {
             this.width,
             this.height
           );
+        //ctx.fillStyle = this.color;
+        //ctx.fillRect = (this.x, this.y, this.width, this.height)
+        //ctx.drawImage(this.image, this.x, this.y)
     }
-    update () {
-        this.frameTimer++;
-        if (this.frameTimer >= this.frameDelay) {
-          this.frames++;
-          this.frameTimer = 0;
-        }
-    
-        if (this.frames >= 4 && this.currentSprite === this.standing_l) {
-          this.frames = 0;
-        }
-        if (this.frames >= 4 && this.currentSprite === this.standing_r) {
-            this.frames = 0;
-        }
-        if (this.frames >= 4 && this.currentSprite === this.walking_l) {
-            this.frames = 0;
-        }
-        if (this.frames >= 4 && this.currentSprite === this.walking_r) {
-            this.frames = 0;
-        }
 
-        if (keys.KeyA || keys.ArrowLeft) {
-            this.x -= this.speed;
-            this.currentSprite = this.walking_l;
-        }
-        if (keys.KeyD || keys.ArrowRight) {
-            this.x += this.speed;
-            this.currentSprite = this.walking_r;
-        }
-        if ((keys.KeyW || keys.ArrowUp) && (keys.KeyA || keys.ArrowLeft)) {
-            this.y -= this.speed/4;
-            this.currentSprite = this.walking_l;
-        }
-        if ((keys.KeyW || keys.ArrowUp) && (keys.KeyD || keys.ArrowRight)) {
-            this.y -= this.speed/4;
-            this.currentSprite = this.walking_r;
-        }
-        if ((keys.KeyS || keys.ArrowDown) && (keys.KeyA || keys.ArrowLeft)) {
-            this.y += this.speed/4;
-            this.currentSprite = this.walking_l;
-        }
-        if ((keys.KeyS || keys.ArrowDown) && (keys.KeyD || keys.ArrowRight)) {
-            this.y += this.speed/4;
-            this.currentSprite = this.walking_r;
-        }
-        if (keys.KeyW || keys.ArrowUp) {
-            this.y -= this.speed;
-            this.currentSprite = this.walking_r;
-        }
-        if (keys.KeyS || keys.ArrowDown) {
-            this.y += this.speed;
-            this.currentSprite = this.walking_r;
-        }
-
+    obstacles () {
         if (gameState === "gameScreen"){
             for (let building of buildings){
 
@@ -157,6 +118,68 @@ class Player {
                 }
             }
         }
+    }
+
+    update () {
+        this.frameTimer++;
+        if (this.frameTimer >= this.frameDelay) {
+          this.frames++;
+          this.frameTimer = 0;
+        }
+    
+        if (this.frames >= 4 && this.currentSprite === this.standing_l) {
+          this.frames = 0;
+        }
+        if (this.frames >= 4 && this.currentSprite === this.standing_r) {
+            this.frames = 0;
+        }
+        if (this.frames >= 4 && this.currentSprite === this.walking_l) {
+            this.frames = 0;
+        }
+        if (this.frames >= 4 && this.currentSprite === this.walking_r) {
+            this.frames = 0;
+        }
+        if (this.frames >= 4 && this.currentSprite === this.walking_up) {
+            this.frames = 0;
+        }
+
+
+
+        if (keys.KeyA || keys.ArrowLeft) {
+            this.x -= this.speed;
+            this.currentSprite = this.walking_l;
+        }
+        if (keys.KeyD || keys.ArrowRight) {
+            this.x += this.speed;
+            this.currentSprite = this.walking_r;
+        }
+        if (keys.KeyS || keys.ArrowDown) {
+            this.y += this.speed;
+            this.currentSprite = this.walking_r;
+        }
+        if (keys.KeyW || keys.ArrowUp) {
+            this.y -= this.speed;
+            this.currentSprite = this.walking_up;
+        }
+        if ((keys.KeyS || keys.ArrowDown) && (keys.KeyA || keys.ArrowLeft)) {
+            this.y += this.speed/4;
+            this.currentSprite = this.walking_l;
+        }
+        if ((keys.KeyS || keys.ArrowDown) && (keys.KeyD || keys.ArrowRight)) {
+            this.y += this.speed/4;
+            this.currentSprite = this.walking_r;
+        }
+        
+        if ((keys.KeyW || keys.ArrowUp) && (keys.KeyA || keys.ArrowLeft)) {
+            this.y -= this.speed/4;
+            this.currentSprite = this.walking_l;
+        }
+        if ((keys.KeyW || keys.ArrowUp) && (keys.KeyD || keys.ArrowRight)) {
+            this.y -= this.speed/4;
+            this.currentSprite = this.walking_r;
+        }
+
+        this.obstacles();
         this.boundaries();
         this.draw();
     }
@@ -177,15 +200,105 @@ class Building {
 }
 
 class Doors {
-    constructor(x,y) {
-        this.x = x,
-        this.y = y,
-        this.width = 25;
-        this.height = 25;
+    constructor(x,y, width, height, alpha) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.alpha = alpha;
     }
     draw() {
-        ctx.fillStyle = "rgba(0, 0, 0,0)";
-        ctx.fillRect(this.x, this.y, this.width, this.height)
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+        ctx.fillRect(this.x - this.width/2, this.y, this.width, this.height);
+        ctx.fillStyle = `rgba(255,0,0, ${this.alpha})`
+        ctx.textAlign = 'center'
+        ctx.font = "20px Impact"
+        ctx.fillText('EXIT', this.x, this.y+20)
+    }
+}
+
+class Blocks {
+    constructor(jsonPath, x, y) {
+        this.hue = 0;
+        this.blockSize = 32; // Size of each block
+        this.blocks = [];
+        this.jsonPath = jsonPath;
+        this.x = x;
+        this.y = y;
+    }
+
+    async loadLevel() {
+        try {
+            const response = await fetch(this.jsonPath);
+            const data = await response.json();
+            this.blocks = [];
+
+            for (let row = 0; row < data.blocks.length; row++) {
+                for (let col = 0; col < data.blocks[row].length; col++) {
+                    if (data.blocks[row][col] === 1) {
+                        this.blocks.push({
+                            x: col * this.blockSize,
+                            y: row * this.blockSize,
+                            width: this.blockSize,
+                            height: this.blockSize
+                        });
+                    }
+                }
+            }
+
+        } catch (error) {
+            console.error("Error loading level data:", error);
+        }
+    }
+    drawLevel() {
+        this.blocks.forEach(block => {
+            ctx.fillStyle = `hsl(${this.hue}, 100%, 50%)`;
+            //ctx.fillRect(this.x, this.y, this.blockSize, this.blockSize);
+            if (performance.now() % 10 < 1) {  // Update every 10ms
+                this.hue = (this.hue + 1.5) % 360;
+            }
+            ctx.fillRect(block.x, block.y, this.blockSize, this.blockSize);
+        });
+    }
+}
+
+class NPC {
+    constructor (x,y, width, height, image) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.image = image;
+        this.frames = 0;
+        this.frameDelay = 10;
+        this.frameTimer = 0;
+    }
+
+    draw () {
+        ctx.drawImage(
+            this.image,
+            this.width * this.frames,
+            0,
+            this.width,
+            this.height,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+          );
+        }
+    update () {
+        this.frameTimer++;
+        if (this.frameTimer >= this.frameDelay) {
+          this.frames++;
+          this.frameTimer = 0;
+        }
+    
+        if (this.frames >= 4) {
+          this.frames = 0;
+        }
+
+        this.draw();
     }
 }
 
@@ -208,11 +321,16 @@ let loadedImages;
 let player;
 let buildings = [];
 let house;
+let greenshroom;
 let doorhouse1;
 let doorhouse2;
 let doorhouse3;
 let doorhouse4;
 let doorhouseout;
+let doorhouseout1;
+let agaricSprite;
+let level1 = new Blocks('level1.json');
+
 
 function isColliding(obj1, obj2) {
     return (
@@ -230,6 +348,62 @@ function collisionDoor(obj1, obj2, stateChange, x, y) {
         player.y = y
     }
 }
+
+function collisionNPC(obj1, obj2, text) {
+    if (isColliding(obj1, obj2)) {
+        repulsionLogic(obj1,obj2)
+        ctx.font = "20px Impact"
+        let textWidth = ctx.measureText(text).width;
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.fillRect(obj2.x - textWidth/2 - 10, obj2.y - 20, textWidth + 20, 25);
+        ctx.strokeRect(obj2.x - textWidth/2 - 10, obj2.y - 20, textWidth + 20, 25);
+        ctx.textAlign = 'center'
+        ctx.fillStyle = 'black'
+        ctx.fillText(text, obj2.x, obj2.y)
+    }
+}
+
+function repulsionLogic(obj1, obj2){
+    let overlapX = Math.min(
+        obj1.x + obj1.width - obj2.x,  
+        obj2.x + obj2.width - obj1.x   
+    );
+
+    let overlapY = Math.min(
+        obj1.y + obj1.height - obj2.y,  
+        obj2.y + obj2.height - obj1.y   
+    );
+
+    // Resolve the smallest overlap first to prevent diagonal clipping
+    if (overlapX < overlapY) {
+        if (obj1.x < obj2.x) {
+            obj1.x = Math.max(0, obj1.x - overlapX); // Push left
+        } else {
+            obj1.x += overlapX; // Push right
+        }
+    } else {
+        if (obj1.y < obj2.y) {
+            obj1.y = Math.max(0, obj1.y - overlapY); // Push up
+        } else {
+            obj1.y += overlapY; // Push down
+        }
+    }
+}
+
+function collisionsBlocks(player, blocks) {
+    let collidingBlocks = [];
+    for (let block of blocks) {
+        if (isColliding(player, block)) {
+            collidingBlocks.push(block);
+        }
+    }
+    return collidingBlocks; // Return an array of colliding blocks
+}
+/*
+
+*/
 
 function gameLoop() {
     if (gameState === "introScreen") {
@@ -266,6 +440,8 @@ function gameScreen() {
     ctx.drawImage(loadedImages.map_img,0,0)
 
     player.update();
+    greenshroom.update();
+    eggshroom.update();
     buildings.forEach((building) => building.draw());
     //house.draw();
     doorhouse1.draw();
@@ -277,21 +453,47 @@ function gameScreen() {
     collisionDoor(player, doorhouse2, 'homeScreen2', 250, 400);
     collisionDoor(player, doorhouse3, 'homeScreen3', 250, 400);
     collisionDoor(player, doorhouse4, 'homeScreen4', 250, 400);
+    //collisionDoor(player, agaricSprite, 'homeScreen4', 250, 400);
+
+    //animSprite(agaricSprite, 10, loadedImages.fly_agaric, 200, 20, 150, 200, 4)
+    agaricSprite.update();
+
+    collisionNPC(player, greenshroom, "HELLO TANGY");
+    collisionNPC(player, eggshroom, "ARE YOU NEW HERE?");
+    collisionNPC(player, agaricSprite, "HELLO LITTLE ONE");
+
+   
 }
 
+let hue = 0;
 function homeScreen1() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "rgb(90, 58, 2)";
+    //ctx.fillStyle = "rgb(90, 58, 2)";
+    //ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    hue = (hue + 1) % 360; // Keep hue cycling smoothly
+
     ctx.fillStyle = "rgba(0, 0, 0,1)";
     ctx.fillRect(250, 450, 25, 25)
     ctx.font = "30px Impact"
-    ctx.fillText("WHAT SHALL WE DO???", 50,100)
+    ctx.textAlign='center'
+    ctx.fillText("TRIPPY ENOUGH FOR YA???", canvas.width/2,420)
+    level1.drawLevel(level1.blocks)
 
     player.update();
     doorhouseout.draw();
+    doorhouseout1.draw();
 
     collisionDoor(player, doorhouseout, 'gameScreen', 90, 230);
+    collisionDoor(player, doorhouseout1, 'homeScreen2', canvas.width/2, 30);
+    
+    let collidingBlocks = collisionsBlocks(player, level1.blocks);
+    if (collidingBlocks.length > 0) { 
+        for (let block of collidingBlocks) {
+            repulsionLogic(player, block); // Resolve each collision separately
+        }
+    }
 }
 
 function homeScreen2() {
@@ -321,7 +523,7 @@ function homeScreen3() {
     player.update();
     doorhouseout.draw();
 
-    collisionDoor(player, doorhouseout, 'gameScreen', 90, 460);
+    collisionDoor(player, doorhouseout, 'gameScreen', 90, 430);
 }
 
 function homeScreen4() {
@@ -358,20 +560,28 @@ function winScreen() {
     console.log("All images loaded!");
 
     player = new Player(canvas.width/2 -25, 400, 32, 32, loadedImages.shroom_standl,
-        loadedImages.shroom_standr, loadedImages.shroom_walkl, loadedImages.shroom_walkr,
-        loadedImages.shroom_standr);
+        loadedImages.shroom_standr, loadedImages.shroom_walkup, loadedImages.shroom_walkl, 
+        loadedImages.shroom_walkr, loadedImages.shroom_standr);
+
+    greenshroom = new NPC(250,250,32,32, loadedImages.greenshroom_img);
+    eggshroom = new NPC(400,230,32,32, loadedImages.eggshroom_img);
+    agaricSprite = new NPC(220, 75, 90,120,loadedImages.fly_agaric);
 
     buildings = [
         new Building(45,100, loadedImages.house_img),
         new Building(340,100, loadedImages.house_img),
+        new Building(50,300, loadedImages.house_img),
         new Building(330,300, loadedImages.house_img),
-        new Building(50,330, loadedImages.house_img)
+        
     ]
-    doorhouse1 = new Doors(90,200)
-    doorhouse2 = new Doors(380,200)
-    doorhouse3 = new Doors(90,430)
-    doorhouse4 = new Doors(370,400)
-    doorhouseout = new Doors(250,450)
+    doorhouse1 = new Doors(90,195, 25, 25, 0)
+    doorhouse2 = new Doors(380,195, 25, 25, 0)
+    doorhouse3 = new Doors(90,395, 25, 25, 0)
+    doorhouse4 = new Doors(370,395, 25, 25, 0)
+    doorhouseout = new Doors(canvas.width/2,450, 50, 25, 1)
+    doorhouseout1 = new Doors(canvas.width/2,250, 50, 25, 1)
+
+    await level1.loadLevel();
     
     gameLoop();
 })();
