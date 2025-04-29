@@ -1,5 +1,5 @@
-import { NPCDialogueAgaric1, NPCDialogueGreen1, NPCDialogueEgg1 } from "https://raw.githubusercontent.com/Swillycoder/shrooms/main/npc.js";
-import { introScreen } from "https://raw.githubusercontent.com/Swillycoder/shrooms/main/states.js";
+import { NPCDialogueAgaric1, NPCDialogueGreen1, NPCDialogueEgg1 } from "./npc.js";
+import { introScreen } from "./states.js";
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
