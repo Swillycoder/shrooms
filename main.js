@@ -1,3 +1,6 @@
+import { NPCDialogueAgaric1, NPCDialogueGreen1, NPCDialogueEgg1 } from "https://raw.githubusercontent.com/Swillycoder/shrooms/main/npc.js";
+import { introScreen } from "https://raw.githubusercontent.com/Swillycoder/shrooms/main/states.js";
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
@@ -10,15 +13,26 @@ const images = {
     shroom_standr: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/stand_r.png',
     shroom_walkl: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/walk_l.png',
     shroom_walkr: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/walk_r.png',
-    house_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/house.png',
-    map_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/map.png',
-
     shroom_walkup: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/shroomback.png',
     house_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/house.png',
     fly_agaric: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/flyagaricanim.png',
-    greenshroom_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/greenshroomsprite.png',
-    eggshroom_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/eggshroomsprite.png',
-
+    greenshroom_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/greenshroomsprite2.png',
+    eggshroom_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/eggshroomsprite2.png',
+    map_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/map.png',
+    pineconeRed_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/pineconered.png',
+    pineconeBlue_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/pineconeblue.png',
+    pineconeGreen_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/pineconegreen.png',
+    snowflake_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/snowflake.png',
+    snowflakeanim_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/snowflakeanim.png',
+    ice_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/ice.png',
+    flame_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/flame.png',
+    flameanim_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/flameanim.png',
+    log_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/log.png',
+    lifemeter_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/lifebar.png',
+    door_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/door1.png',
+    rock_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/rock.png',
+    winScreen_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/winscreen.png',
+    altar_img: 'https://raw.githubusercontent.com/Swillycoder/shrooms/main/altar.png',
 };
 
 const loadImage = (src) => {
@@ -61,6 +75,7 @@ class Player {
         this.frames = 0;
         this.frameDelay = 10;
         this.frameTimer = 0;
+        this.hp = 10;
     }
 
     boundaries () {
@@ -68,6 +83,14 @@ class Player {
         if (this.x + this.width >= canvas.width - 25) this.x = canvas.width - this.width - 25;
         if (this.y <= 25) this.y = 25;
         if (this.y + this.height >= canvas.height - 25) this.y = canvas.height - this.height - 25;
+    }
+
+    life () {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(32,0,103,28);
+        ctx.fillStyle = 'red'
+        ctx.fillRect(35, 3, this.hp * 10, 25);
+        ctx.drawImage(loadedImages.lifemeter_img,32,0);
     }
 
     draw () {
@@ -82,9 +105,6 @@ class Player {
             this.width,
             this.height
           );
-        //ctx.fillStyle = this.color;
-        //ctx.fillRect = (this.x, this.y, this.width, this.height)
-        //ctx.drawImage(this.image, this.x, this.y)
     }
 
     obstacles () {
@@ -143,8 +163,6 @@ class Player {
             this.frames = 0;
         }
 
-
-
         if (keys.KeyA || keys.ArrowLeft) {
             this.x -= this.speed;
             this.currentSprite = this.walking_l;
@@ -181,7 +199,36 @@ class Player {
 
         this.obstacles();
         this.boundaries();
+        this.life();
         this.draw();
+    }
+}
+
+class Inventory {
+    constructor(x,y) {
+        this.x = x;
+        this.y = y;
+        this.width = 400;
+        this.height = 400
+        this.items = [];
+    }
+}
+
+class Items{
+    constructor(x,y,image, name, type, gameState) {
+        this.x = x;
+        this.y = y;
+        this.width = 32;
+        this.height = 32;
+        this.image = image;
+        this.name = name;
+        this.type = type;
+        this.gameState = gameState;
+    }
+
+    draw(currentGameState) {
+        if (this.gameState === currentGameState)
+            ctx.drawImage(this.image, this.x, this.y)
     }
 }
 
@@ -210,10 +257,10 @@ class Doors {
     draw() {
         ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
         ctx.fillRect(this.x - this.width/2, this.y, this.width, this.height);
-        ctx.fillStyle = `rgba(255,0,0, ${this.alpha})`
-        ctx.textAlign = 'center'
-        ctx.font = "20px Impact"
-        ctx.fillText('EXIT', this.x, this.y+20)
+    }
+
+    draw2 () {
+        ctx.drawImage(loadedImages.door_img, this.x,this.y);
     }
 }
 
@@ -222,9 +269,14 @@ class Blocks {
         this.hue = 0;
         this.blockSize = 32; // Size of each block
         this.blocks = [];
+        this.blocks2 = [];
         this.jsonPath = jsonPath;
         this.x = x;
         this.y = y;
+        this.red = 255;
+        this.green = 255;
+        this.blue = 255;
+        this.fadeDirection = -1
     }
 
     async loadLevel() {
@@ -250,14 +302,78 @@ class Blocks {
             console.error("Error loading level data:", error);
         }
     }
-    drawLevel() {
+
+    drawLevel1() {
+        this.blocks.forEach(block => {
+            if (this.blue <= 0 || this.blue >= 255) {
+                this.fadeDirection *= -1; // Reverse direction
+            }
+            
+            this.blue += 0.01 * this.fadeDirection;
+            this.green += 0.01 * this.fadeDirection;
+            
+            // Clamp values to avoid going outside 0–255
+            this.blue = Math.max(0, Math.min(255, this.blue));
+            this.green = Math.max(0, Math.min(255, this.green));
+            
+            ctx.fillStyle = `rgb(255, ${this.green}, ${this.blue})`;
+            ctx.strokeStyle = 'black';
+            ctx.fillRect(block.x, block.y, this.blockSize, this.blockSize);
+            ctx.strokeRect(block.x, block.y, this.blockSize, this.blockSize);
+            ctx.drawImage(loadedImages.flame_img, block.x, block.y)
+        });
+    }
+
+    drawLevel2() {
+        this.blocks.forEach(block => {
+            if (this.red <= 0 || this.red >= 255) {
+                this.fadeDirection *= -1; // Reverse direction
+            }
+            
+            this.red += 0.01 * this.fadeDirection;
+            this.green += 0.01 * this.fadeDirection;
+            
+            // Clamp values to avoid going outside 0–255
+            this.red = Math.max(0, Math.min(255, this.red));
+            this.green = Math.max(0, Math.min(255, this.green));
+            
+            ctx.fillStyle = `rgb(${this.red}, ${this.green}, 255)`;
+            ctx.strokeStyle = 'black';
+            ctx.fillRect(block.x, block.y, this.blockSize, this.blockSize);
+            ctx.strokeRect(block.x, block.y, this.blockSize, this.blockSize);
+            ctx.drawImage(loadedImages.snowflake_img, block.x, block.y)
+        });
+    }
+
+    drawLevel3() {
+        this.blocks.forEach(block => {
+            if (this.red <= 0 || this.red >= 255) {
+                this.fadeDirection *= -1; // Reverse direction
+            }
+            
+            this.blue += 0.01 * this.fadeDirection;
+            this.red += 0.01 * this.fadeDirection;
+            
+            // Clamp values to avoid going outside 0–255
+            this.red = Math.max(0, Math.min(255, this.red));
+            this.blue = Math.max(0, Math.min(255, this.blue));
+            
+            ctx.fillStyle = `rgb(${this.red}, 255, ${this.blue})`;
+            ctx.strokeStyle = 'black';
+            ctx.fillRect(block.x, block.y, this.blockSize, this.blockSize);
+            ctx.strokeRect(block.x, block.y, this.blockSize, this.blockSize);
+            ctx.drawImage(loadedImages.log_img, block.x, block.y)
+        });
+    }
+    drawLevel4() {
         this.blocks.forEach(block => {
             ctx.fillStyle = `hsl(${this.hue}, 100%, 50%)`;
-            //ctx.fillRect(this.x, this.y, this.blockSize, this.blockSize);
+            ctx.strokeStyle = 'black'
             if (performance.now() % 10 < 1) {  // Update every 10ms
                 this.hue = (this.hue + 1.5) % 360;
             }
             ctx.fillRect(block.x, block.y, this.blockSize, this.blockSize);
+            ctx.strokeRect(block.x, block.y, this.blockSize, this.blockSize);
         });
     }
 }
@@ -302,12 +418,81 @@ class NPC {
     }
 }
 
+class Obstacle {
+    constructor (x,y, color, speedX, speedY, distance, sprite) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.width = 32;
+        this.height = 32;
+        this.speedX = speedX;
+        this.speedY = speedY;
+        this.distance = distance;
+        this.startX = x;
+        this.startY = y;
+        this.frames = 0;
+        this.frameDelay = 10;
+        this.frameTimer = 0;
+        this.sprite = sprite
+    }
+    draw () {
+        ctx.drawImage(
+            this.sprite,
+            this.width * this.frames,
+            0,
+            this.width,
+            this.height,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
+    }
+    update () {
+        this.frameTimer++;
+        if (this.frameTimer >= this.frameDelay) {
+          this.frames++;
+          this.frameTimer = 0;
+        }
+    
+        if (this.frames >= 4) {
+          this.frames = 0;
+        }
+
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        const dx = this.x - this.startX;
+        const dy = this.y - this.startY;
+
+        if (Math.abs(dx) >= this.distance || Math.abs(dy) >= this.distance) {
+            this.x = this.startX;
+            this.y = this.startY;
+        }
+        this.draw()
+    }
+}
+
+class Scenery {
+    constructor(x,y, image) {
+        this.x = x;
+        this.y = y;
+        this.image = image;
+        this.width = this.image.width;
+        this.height = this.image.height;
+
+    }
+    draw() {
+        ctx.drawImage(this.image, this.x, this.y)
+    }
+}
 
 const keys = {
     KeyA: false,
     KeyD: false,
     KeyW: false,
     KeyS: false,
+    KeyI: false,
     ArrowLeft: false,
     ArrowRight: false,
     ArrowUp: false,
@@ -320,16 +505,47 @@ let gameState = "introScreen";
 let loadedImages;
 let player;
 let buildings = [];
-let house;
+let items = [];
+let pinecones = [];
+let eggshroom;
 let greenshroom;
 let doorhouse1;
 let doorhouse2;
 let doorhouse3;
 let doorhouse4;
 let doorhouseout;
-let doorhouseout1;
+let doorhouseout2;
 let agaricSprite;
 let level1 = new Blocks('level1.json');
+let level2 = new Blocks('level2.json');
+let level3 = new Blocks('level3.json');
+let level4 = new Blocks('level4.json');
+
+let fireObstacles = [];
+let obstacleFire1;
+let obstacleFire2;
+let obstacleFire3;
+let obstacleFire4;
+let obstacleFire5;
+
+let iceObstacles = [];
+let obstacleIce1;
+let obstacleIce2;
+let obstacleIce3;
+let obstacleIce4;
+let obstacleIce5;
+
+let earthObstacles = [];
+let obstacleEarth1;
+let obstacleEarth2;
+let obstacleEarth3;
+let obstacleEarth4;
+let obstacleEarth5;
+
+let altars = [];
+let altarFire;
+let altarIce;
+let altarEarth;
 
 
 function isColliding(obj1, obj2) {
@@ -349,20 +565,80 @@ function collisionDoor(obj1, obj2, stateChange, x, y) {
     }
 }
 
-function collisionNPC(obj1, obj2, text) {
-    if (isColliding(obj1, obj2)) {
-        repulsionLogic(obj1,obj2)
-        ctx.font = "20px Impact"
-        let textWidth = ctx.measureText(text).width;
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 2;
-        ctx.fillRect(obj2.x - textWidth/2 - 10, obj2.y - 20, textWidth + 20, 25);
-        ctx.strokeRect(obj2.x - textWidth/2 - 10, obj2.y - 20, textWidth + 20, 25);
-        ctx.textAlign = 'center'
-        ctx.fillStyle = 'black'
-        ctx.fillText(text, obj2.x, obj2.y)
+function collisionObstacle(obj1, obj2) {
+    if (gameState === "homeScreen1")
+        if (isColliding(obj1, obj2)) {
+            player.hp -= 1;
+            obj2.x =-32;
+            obj2.y =-32;
+        const index = fireObstacles.indexOf(obj2);
+        
+        if (index !== -1) {
+            fireObstacles.splice(index, 1);
+        }
     }
+
+    if (gameState === "homeScreen2")
+        if (isColliding(obj1, obj2)) {
+            player.hp -= 1;
+            obj2.x =-32;
+            obj2.y =-32;
+        const index2 = iceObstacles.indexOf(obj2);
+        if (index2 !== -1) {
+            iceObstacles.splice(index2, 1);
+        }
+    }
+
+    if (gameState === "homeScreen3")
+        if (isColliding(obj1, obj2)) {
+            player.hp -= 1;
+            obj2.x =-32;
+            obj2.y =-32;
+        const index3 = earthObstacles.indexOf(obj2);
+        if (index3 !== -1) {
+            earthObstacles.splice(index3, 1);
+        }
+    }
+}
+
+function collisionItem(player, item) {
+    if (isColliding(player, item)) {
+        console.log("Collision with:", item.name);
+        if(item.type === "pinecone") {
+            pinecones.push(item);
+        }
+        removeItem(item);
+    }
+}
+
+function removeItem(item) {
+    const index = items.indexOf(item);
+    if (index > -1) {
+        items.splice(index, 1)
+    }
+}
+
+function checkItemCollisions(itemName) {
+    const item = items.find(item => item.name === itemName && isColliding(player, item));
+
+    if (item) {
+        collisionItem(player, item);
+    }
+}
+
+function drawItems(itemName) {
+    const item = items.find(item => item.name === itemName);
+    if (item) {
+        item.draw();
+    }
+}
+
+function collisionNPC(obj1, obj2) {
+    if (isColliding(obj1, obj2)) {
+        repulsionLogic(obj1,obj2);
+        return true;
+    }
+    return false;
 }
 
 function repulsionLogic(obj1, obj2){
@@ -401,15 +677,23 @@ function collisionsBlocks(player, blocks) {
     }
     return collidingBlocks; // Return an array of colliding blocks
 }
-/*
 
-*/
+function collisionScenery(obj1, obj2) {
+    if (isColliding(obj1, obj2)) {
+        repulsionLogic(obj1,obj2);
+        return true;
+    }
+    return false;
+}
 
 function gameLoop() {
     if (gameState === "introScreen") {
-        introScreen();
+        introScreen(ctx, loadedImages.intro_img);
+    } else if (gameState === "inventory") {
+        inventory();
     } else if (gameState === "gameScreen") {
         gameScreen();
+
     } else if (gameState === "homeScreen1") {
         homeScreen1();
     } else if (gameState === "homeScreen2") {
@@ -418,6 +702,16 @@ function gameLoop() {
         homeScreen3();
     } else if (gameState === "homeScreen4") {
         homeScreen4();
+
+    } else if (gameState === "NPCDialogueAgaric1") {
+        NPCDialogueAgaric1(ctx);
+
+    } else if (gameState === "NPCDialogueGreen1") {
+        NPCDialogueGreen1(ctx);
+
+    } else if (gameState === "NPCDialogueEgg1") {
+        NPCDialogueEgg1(ctx);
+
     } else if (gameState === "gameOverScreen") {
         gameOverScreen();
     } else if (gameState === "winScreen") {
@@ -426,11 +720,8 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-function introScreen() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "rgb(82, 110, 150)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(loadedImages.intro_img,6,6)
+function inventory() {
+    return
 }
 
 function gameScreen() {
@@ -443,52 +734,103 @@ function gameScreen() {
     greenshroom.update();
     eggshroom.update();
     buildings.forEach((building) => building.draw());
-    //house.draw();
+
     doorhouse1.draw();
     doorhouse2.draw();
     doorhouse3.draw();
     doorhouse4.draw();
 
-    collisionDoor(player, doorhouse1, 'homeScreen1', 250, 400);
-    collisionDoor(player, doorhouse2, 'homeScreen2', 250, 400);
-    collisionDoor(player, doorhouse3, 'homeScreen3', 250, 400);
-    collisionDoor(player, doorhouse4, 'homeScreen4', 250, 400);
-    //collisionDoor(player, agaricSprite, 'homeScreen4', 250, 400);
+    collisionDoor(player, doorhouse1, 'homeScreen1', 222, 400);
+    collisionDoor(player, doorhouse2, 'homeScreen2', 222, 400);
+    collisionDoor(player, doorhouse3, 'homeScreen3', 222, 400);
+    collisionDoor(player, doorhouse4, 'homeScreen4', 222, 400);
 
-    //animSprite(agaricSprite, 10, loadedImages.fly_agaric, 200, 20, 150, 200, 4)
     agaricSprite.update();
 
-    collisionNPC(player, greenshroom, "HELLO TANGY");
-    collisionNPC(player, eggshroom, "ARE YOU NEW HERE?");
-    collisionNPC(player, agaricSprite, "HELLO LITTLE ONE");
+    if (collisionNPC(player, greenshroom))
+        gameState = "NPCDialogueGreen1";
 
-   
+    if (collisionNPC(player, eggshroom))
+        gameState = "NPCDialogueEgg1";;
+
+    if (pinecones.length < 3 && collisionNPC(player, agaricSprite))
+        gameState = "NPCDialogueAgaric1"
+
+    if (pinecones.length === 3 && collisionNPC(player, agaricSprite)) {
+        gameState = 'winScreen'
+    }
+
 }
 
-let hue = 0;
+
 function homeScreen1() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //ctx.fillStyle = "rgb(90, 58, 2)";
-    //ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+    ctx.fillStyle = "rgb(222, 21, 21)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    hue = (hue + 1) % 360; // Keep hue cycling smoothly
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 440, 512, 48);
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0, 488, 512, 48);
+    ctx.fillStyle = 'pink';
+    
+    fireObstacles.forEach(obstacle => {
+        obstacle.update();
+    });
 
-    ctx.fillStyle = "rgba(0, 0, 0,1)";
-    ctx.fillRect(250, 450, 25, 25)
-    ctx.font = "30px Impact"
-    ctx.textAlign='center'
-    ctx.fillText("TRIPPY ENOUGH FOR YA???", canvas.width/2,420)
-    level1.drawLevel(level1.blocks)
+    level1.drawLevel1(level1.blocks)
 
     player.update();
-    doorhouseout.draw();
-    doorhouseout1.draw();
+    doorhouseout.draw2();
+
+    drawItems("pineconeRed");
+    checkItemCollisions("pineconeRed");
 
     collisionDoor(player, doorhouseout, 'gameScreen', 90, 230);
-    collisionDoor(player, doorhouseout1, 'homeScreen2', canvas.width/2, 30);
+
+    collisionObstacle(player, obstacleFire1);
+    collisionObstacle(player, obstacleFire2);
+    collisionObstacle(player, obstacleFire3);
+    collisionObstacle(player, obstacleFire4);
+    collisionObstacle(player, obstacleFire5);
     
     let collidingBlocks = collisionsBlocks(player, level1.blocks);
+    if (collidingBlocks.length > 0) { 
+        for (let block of collidingBlocks) {
+            repulsionLogic(player, block);
+        }
+    }
+}
+
+function homeScreen2() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(loadedImages.ice_img, 0,0)
+    ctx.fillStyle = "rgb(22, 49, 75)";
+    ctx.fillRect(250, 450, 25, 25);
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 440, 512, 48);
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0, 488, 512, 48);
+
+    iceObstacles.forEach(obstacle => {
+        obstacle.update();
+    });
+
+    level2.drawLevel2(level2.blocks)
+
+    player.update();
+    doorhouseout.draw2();
+    drawItems("pineconeBlue");
+    checkItemCollisions("pineconeBlue");
+
+    collisionDoor(player, doorhouseout, 'gameScreen', 380, 230);
+
+    collisionObstacle(player, obstacleIce1);
+    collisionObstacle(player, obstacleIce2);
+    collisionObstacle(player, obstacleIce3);
+    collisionObstacle(player, obstacleIce4);
+    collisionObstacle(player, obstacleIce5);
+
+    let collidingBlocks = collisionsBlocks(player, level2.blocks);
     if (collidingBlocks.length > 0) { 
         for (let block of collidingBlocks) {
             repulsionLogic(player, block); // Resolve each collision separately
@@ -496,50 +838,121 @@ function homeScreen1() {
     }
 }
 
-function homeScreen2() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "rgb(255, 161, 0)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "rgba(0, 0, 0,1)";
-    ctx.fillRect(250, 450, 25, 25)
-    ctx.font = "30px Impact"
-    ctx.fillText("WHAT SHALL WE DO???", 50,100)
-
-    player.update();
-    doorhouseout.draw();
-
-    collisionDoor(player, doorhouseout, 'gameScreen', 380, 230);
-}
-
 function homeScreen3() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "rgb(80, 0, 133)";
+    ctx.fillStyle = "limegreen";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "rgba(0, 0, 0,1)";
-    ctx.fillRect(250, 450, 25, 25)
-    ctx.font = "30px Impact"
-    ctx.fillText("WHAT SHALL WE DO???", 50,100)
+    ctx.fillStyle = "rgb(9, 131, 0)";
+    ctx.fillRect(250, 450, 25, 25);
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 440, 512, 48);
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0, 488, 512, 48);
+
+    earthObstacles.forEach(obstacle => {
+        obstacle.update();
+    });
+
+    level3.drawLevel3(level3.blocks)
 
     player.update();
-    doorhouseout.draw();
+    doorhouseout.draw2();
+    drawItems("pineconeGreen");
+    checkItemCollisions("pineconeGreen");
 
-    collisionDoor(player, doorhouseout, 'gameScreen', 90, 430);
+    collisionDoor(player, doorhouseout, 'gameScreen', 80, 420);
+
+    collisionObstacle(player, obstacleEarth1);
+    collisionObstacle(player, obstacleEarth2);
+    collisionObstacle(player, obstacleEarth3);
+    collisionObstacle(player, obstacleEarth4);
+    collisionObstacle(player, obstacleEarth5);
+
+    let collidingBlocks = collisionsBlocks(player, level3.blocks);
+    if (collidingBlocks.length > 0) { 
+        for (let block of collidingBlocks) {
+            repulsionLogic(player, block); // Resolve each collision separately
+        }
+    }
 }
+
+let hue = 0;
+let pineconeRedPlaced = false;
+let pineconeBluePlaced = false;
+let pineconeGreenPlaced = false;
 
 function homeScreen4() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "rgb(173, 1, 18)";
+    ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    hue = (hue + 1) % 360; // Keep hue cycling smoothly
     ctx.fillStyle = "rgba(0, 0, 0,1)";
     ctx.fillRect(250, 450, 25, 25)
-    ctx.font = "30px Impact"
-    ctx.fillText("WHAT SHALL WE DO???", 50,100)
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 440, 512, 48);
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0, 488, 512, 48);
+
+    altars.forEach(altar => {
+        altar.draw();
+    });
+
+    level4.drawLevel4(level4.blocks)
 
     player.update();
-    doorhouseout.draw();
+    doorhouseout2.draw2();
+    collisionDoor(player, doorhouseout, 'gameScreen', 350, 420);
 
-    collisionDoor(player, doorhouseout, 'gameScreen', 370, 430);
+    if (gameState === "homeScreen4" && collisionScenery(player, altarFire)){
+        if (pinecones.length >= 3 && player.y <= 250){
+            pineconeRedPlaced = true;
+        }
+    }
+        if (pineconeRedPlaced === true) {
+            const redPinecone = pinecones.find(item => item.name === "pineconeRed");
+            if (redPinecone) {
+                redPinecone.x = 140;
+                redPinecone.y = 180;
+                redPinecone.draw();
+            }
+        }
+
+    if (gameState === "homeScreen4" && collisionScenery(player, altarIce)) {
+        if (pinecones.length >= 3){
+                pineconeBluePlaced = true;
+        }
+    }
+        if (pineconeBluePlaced) {
+            const bluePinecone = pinecones.find(item => item.name === "pineconeBlue");
+            if (bluePinecone) {
+                bluePinecone.x = canvas.width/2 - 16;
+                bluePinecone.y = 180;
+                bluePinecone.draw();
+            }
+        }
+
+    if (gameState === "homeScreen4" && collisionScenery(player, altarEarth)) {
+        if (pinecones.length >= 3){
+                pineconeGreenPlaced = true;
+        }
+    }
+        if (pineconeGreenPlaced && gameState === "homeScreen4") {
+            const greenPinecone = pinecones.find(item => item.name === "pineconeGreen");
+            if (greenPinecone) {
+                greenPinecone.x = 345;
+                greenPinecone.y = 180;
+                greenPinecone.draw();
+            }
+        }
+    }
+
+    let collidingBlocks = collisionsBlocks(player, level4.blocks);
+    if (collidingBlocks.length > 0) { 
+        for (let block of collidingBlocks) {
+            repulsionLogic(player, block); // Resolve each collision separately
+    }
 }
+
 
 function gameOverScreen () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -552,6 +965,17 @@ function winScreen() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'skyblue'
     ctx.fillRect(0,0,canvas.width, canvas.height)
+    ctx.drawImage(loadedImages.winScreen_img,0,0)
+    ctx.fillStyle = 'black'
+    ctx.textAlign = 'center'
+    ctx.font = '25px "Freckle Face"';
+    ctx.fillText("THANK YOU!!!", 385, 55)
+    
+    ctx.font = '15px "Freckle Face"';
+    ctx.fillText("YOU FOUND MY PINECONES", 385, 70)
+    ctx.fillText("PLACE THEM ON THE ALTARS", 385, 85)
+    ctx.fillText("HIT ENTER", 385, 100)
+    ctx.fillText("TO CONTINUE YOUR QUEST", 385, 115)
 }
 
 (async () => {
@@ -559,12 +983,12 @@ function winScreen() {
     loadedImages = await loadAllImages(images);
     console.log("All images loaded!");
 
-    player = new Player(canvas.width/2 -25, 400, 32, 32, loadedImages.shroom_standl,
+    player = new Player(canvas.width/2 -18, 400, 32, 32, loadedImages.shroom_standl,
         loadedImages.shroom_standr, loadedImages.shroom_walkup, loadedImages.shroom_walkl, 
         loadedImages.shroom_walkr, loadedImages.shroom_standr);
-
-    greenshroom = new NPC(250,250,32,32, loadedImages.greenshroom_img);
-    eggshroom = new NPC(400,230,32,32, loadedImages.eggshroom_img);
+    //NPCs
+    greenshroom = new NPC(230,270,40,40, loadedImages.greenshroom_img);
+    eggshroom = new NPC(420,250,40,40, loadedImages.eggshroom_img);
     agaricSprite = new NPC(220, 75, 90,120,loadedImages.fly_agaric);
 
     buildings = [
@@ -572,16 +996,55 @@ function winScreen() {
         new Building(340,100, loadedImages.house_img),
         new Building(50,300, loadedImages.house_img),
         new Building(330,300, loadedImages.house_img),
-        
     ]
+    //Doors
     doorhouse1 = new Doors(90,195, 25, 25, 0)
     doorhouse2 = new Doors(380,195, 25, 25, 0)
     doorhouse3 = new Doors(90,395, 25, 25, 0)
     doorhouse4 = new Doors(370,395, 25, 25, 0)
-    doorhouseout = new Doors(canvas.width/2,450, 50, 25, 1)
-    doorhouseout1 = new Doors(canvas.width/2,250, 50, 25, 1)
+    doorhouseout = new Doors(canvas.width/2 - 55,440, 50, 25, 0)
+    doorhouseout2 = new Doors(canvas.width/2 - 39,440, 50, 25, 0)
+    //Items
+    items = [
+        new Items(12*32, 8*32, loadedImages.pineconeRed_img, "pineconeRed", "pinecone"),
+        new Items(9*32, 10*32, loadedImages.pineconeBlue_img, "pineconeBlue", "pinecone"),
+        new Items(14*32, 32, loadedImages.pineconeGreen_img, "pineconeGreen", "pinecone"),
+    ]
 
     await level1.loadLevel();
+    await level2.loadLevel();
+    await level3.loadLevel();
+    await level4.loadLevel();
+
+    fireObstacles = [
+        obstacleFire1 = new Obstacle(0,32,'red', 1.5, 0, 15*32, loadedImages.flameanim_img),
+        obstacleFire2 = new Obstacle(0,7*32,'red', 1.5, 0, 5*32, loadedImages.flameanim_img),
+        obstacleFire3 = new Obstacle(8*32,5*32,'red', 0, 1, 4*32, loadedImages.flameanim_img),
+        obstacleFire4 = new Obstacle(11*32,5*32,'red', 0, 1, 4*32, loadedImages.flameanim_img),
+        obstacleFire5 = new Obstacle(0,4*32,'red', 1, 0, 16*32, loadedImages.flameanim_img),
+    ]
+
+    iceObstacles = [
+        obstacleIce1 = new Obstacle(32,0,'red', 0, 1.5, 11*32, loadedImages.snowflakeanim_img),
+        obstacleIce2 = new Obstacle(4*32,0,'red', 0, 1.5, 8*32, loadedImages.snowflakeanim_img),
+        obstacleIce3 = new Obstacle(14*32,0,'red', 0, 1.5, 11*32, loadedImages.snowflakeanim_img),
+        obstacleIce4 = new Obstacle(0,4*32,'red', 1, 0, 15 * 32, loadedImages.snowflakeanim_img),
+        obstacleIce5 = new Obstacle(0,7*32,'red', 1, 0, 15 * 32, loadedImages.snowflakeanim_img),
+    ]
+
+    earthObstacles = [
+        obstacleEarth1 = new Obstacle(32,0, 'red', 0,1.5,11*32,loadedImages.rock_img),
+        obstacleEarth2 = new Obstacle(4*32,0, 'red', 0,1,9*32,loadedImages.rock_img),
+        obstacleEarth3 = new Obstacle(6*32,0, 'red', 0,1,9*32,loadedImages.rock_img),
+        obstacleEarth4 = new Obstacle(11*32,0, 'red', 0,1.5,11*32,loadedImages.rock_img),
+        obstacleEarth5 = new Obstacle(13*32,0, 'red', 0,1.5,11*32,loadedImages.rock_img),
+    ]
+
+    altars = [
+        altarFire = new Scenery(canvas.width/2 - 125, 200, loadedImages.altar_img),
+        altarIce = new Scenery(canvas.width/2 - 25, 200, loadedImages.altar_img),
+        altarEarth = new Scenery(canvas.width/2 + 75, 200, loadedImages.altar_img),
+    ]
     
     gameLoop();
 })();
@@ -593,11 +1056,29 @@ document.addEventListener('keydown', (e) => {
     if (gameState === "introScreen") {
         if (e.code === 'Space') {
             gameState = "gameScreen"
-
         }
     }
+    if (gameState === "NPCDialogueAgaric1" || gameState === "NPCDialogueGreen1" || gameState === "NPCDialogueEgg1") {
+        if (e.code === 'Enter') {
+            gameState = "gameScreen"
+        }
+    }
+
     if (gameState === "gameOverScreen" || gameState === "winScreen") {
         if (e.code === 'KeyP') {
+            return
+        }
+    }
+    if (gameState === "winScreen") {
+        if (e.code === 'Enter') {
+                gameState = "gameScreen"
+            }
+    }
+    
+
+    if (gameState === "gameScreen" || gameState === "homeScreen1" || gameState === "homeScreen2"
+        || gameState === "homeScreen3" || gameState === "homeScreen4") {
+        if (e.code === 'KeyI') {
             return
         }
     }
